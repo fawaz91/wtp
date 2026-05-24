@@ -21,3 +21,17 @@ def residual_wtp_adjustment(
         return 0.05, "Moderate residual uncertainty: apply up to 5% WTP reduction"
     
     return 0.0, "No additional WTP adjustment: sufficient headroom or limited residual uncertainty"
+    wtp_m = 500000
+u, message = residual_wtp_adjustment(
+    g1_structural=True,
+    g2_decision_impact=True,
+    g3_non_probabilistic=True,
+    headroom_percent=2,
+    scenario_flip=True,
+    scenario_spread_percent=46
+)
+
+effective_wtp = wtp_m * (1 - u)
+
+print(message)
+print(effective_wtp)
