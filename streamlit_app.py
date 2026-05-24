@@ -6,22 +6,27 @@ def residual_wtp_adjustment(
     scenario_flip: bool,
     scenario_spread_percent: float
 ):
-    # Gatekeeper: no adjustment unless G1+G2+G3
+    # Gatekeeper: no adjustment unless G1 + G2 + G3 are all satisfied
     if not (g1_structural and g2_decision_impact and g3_non_probabilistic):
         return 0.0, "No WTP adjustment: G1-G3 not fully satisfied"
 
     # Residual uncertainty classification
     if scenario_flip and headroom_percent < 2:
         return 0.10, "High residual uncertainty: apply up to 10% WTP reduction"
-    
+
     if scenario_flip and headroom_percent < 5:
         return 0.075, "Moderate-high residual uncertainty: apply 5-7.5% WTP reduction"
-    
+
     if scenario_spread_percent > 25 and headroom_percent < 10:
         return 0.05, "Moderate residual uncertainty: apply up to 5% WTP reduction"
-    
+
     return 0.0, "No additional WTP adjustment: sufficient headroom or limited residual uncertainty"
-    wtp_m = 500000
+
+
+# Define Magnussen/severity-adjusted WTP
+wtp_m = 500000
+
+# Run uncertainty adjustment
 u, message = residual_wtp_adjustment(
     g1_structural=True,
     g2_decision_impact=True,
@@ -31,7 +36,9 @@ u, message = residual_wtp_adjustment(
     scenario_spread_percent=46
 )
 
+# Calculate effective WTP
 effective_wtp = wtp_m * (1 - u)
 
 print(message)
-print(effective_wtp)
+print(f"Residual uncertainty adjustment: {u:.1%}")
+print(f"Effective WTP: {effective_wtp:,.0f} NOK/QALY")
